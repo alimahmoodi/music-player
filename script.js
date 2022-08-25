@@ -12,8 +12,15 @@ const circle = document.querySelector(".circle");
 const songDuration = document.querySelector(".timer .end");
 const songCurrentTime = document.querySelector(".timer .start");
 const repeatBtn = document.querySelector("#repeat-plist");
+const fastForward = document.querySelector("#fast-forward");
+const fastRewind = document.querySelector("#fast-rewind");
+const speed = document.querySelector(".speed");
 
 let songIndex = 1;
+
+function randomIntFromInterval(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
 
 function loadSong(indexNum) {
   songName.innerHTML = songsList[indexNum - 1].name;
@@ -64,12 +71,10 @@ prevBtn.addEventListener("click", () => {
 
 mainAudio.addEventListener("timeupdate", (e) => {
   let currentTime = e.target.currentTime;
-  console.log(currentTime);
   let duration = e.target.duration;
-  console.log(duration);
 
   progress.style.strokeDashoffset =
-    100 + (591 * (currentTime / duration) * 100) / 100;
+    691 - (591 * (currentTime / duration) * 100) / 100;
 
   mainAudio.addEventListener("loadeddata", () => {
     let mainAdDuration = mainAudio.duration;
@@ -88,16 +93,52 @@ mainAudio.addEventListener("timeupdate", (e) => {
   songCurrentTime.innerHTML = `${currentMin}:${currentSec}`;
 });
 
+fastForward.addEventListener("click", () => {
+  mainAudio.currentTime += 6;
+  fastForward.setAttribute("title", "fast-forward");
+});
+
+fastRewind.addEventListener("click", () => {
+  mainAudio.currentTime -= 6;
+  fastRewind.setAttribute("title", "fast-rewind");
+});
+
+speed.addEventListener("click", () => {
+  // speed.classList.toggle("add");
+  if (mainAudio.playbackRate === 1) {
+    mainAudio.playbackRate = 2;
+    speed.classList.add("addColor");
+  } else if (mainAudio.playbackRate > 1) {
+    mainAudio.playbackRate = 1;
+    speed.classList.remove("addColor");
+  }
+});
+
 repeatBtn.addEventListener("click", () => {
   let getInerText = repeatBtn.innerText;
-  if (getInerText === "repeat") {
+  if (getInerText == "repeat") {
     repeatBtn.innerText = "repeat_one";
     repeatBtn.setAttribute("title", "Song looped");
-  } else if (getInerText === "repeat_one") {
+  } else if (getInerText == "repeat_one") {
     repeatBtn.innerText = "shuffle";
     repeatBtn.setAttribute("title", "Playback shuffled");
-  } else if (getInerText === "shuffle") {
+  } else if (getInerText == "shuffle") {
     repeatBtn.innerText = "repeat";
     repeatBtn.setAttribute("title", "Playlist looped");
+  }
+});
+
+mainAudio.addEventListener("ended", () => {
+  let getInerText = repeatBtn.innerText;
+  if (getInerText === "repeat") {
+    nextSong();
+  } else if (getInerText === "repeat_one") {
+    mainAudio.currentTime = 0;
+    loadSong(songIndex);
+    playSong();
+  } else if (getInerText === "shuffle") {
+    const shuffleMusic = randomIntFromInterval(1, songsList.length - 1);
+    loadSong(shuffleMusic);
+    playSong();
   }
 });

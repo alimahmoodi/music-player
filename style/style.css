@@ -113,10 +113,10 @@ body {
   stroke-linecap: round;
 }
 .circle2 {
-  stroke: #ea7e1b;
+  stroke: #3c90a9;
   stroke-width: 4px;
   stroke-dasharray: 691;
-  stroke-dashoffset: 100;
+  stroke-dashoffset: 691;
   stroke-linecap: round;
 }
 .dots {
@@ -156,7 +156,7 @@ body {
   color: #7f8184;
 }
 .buttons-area {
-  width: 100%;
+  width: 70%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -167,24 +167,50 @@ body {
   align-items: center;
 }
 .play-pause i {
-  background-color: #e03814;
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
+  /* background-color: #e03814; */
+  /* width: 45px;
+  height: 45px; */
+  /* border-radius: 50%; */
+  font-size: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #fff;
+  color: #3c90a9;
+  /* box-shadow: -4px -2px 20px #48535c, -26px -26px 63px #424f5e; */
+}
+.speed {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: #25282c;
+  color: #85888b;
   box-shadow: -4px -2px 20px #48535c, -26px -26px 63px #424f5e;
 }
-
+#more-button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 #prev,
+#next {
+  font-size: 40px;
+  color: #fff;
+  cursor: pointer;
+}
+
 #repeat-plist,
-#next,
-#more-music {
-  width: 45px;
-  height: 45px;
+#more-music,
+#fast-forward,
+#fast-rewind {
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -193,4 +219,7 @@ body {
   background-color: #25282c;
   color: #85888b;
   box-shadow: -4px -2px 20px #48535c, -26px -26px 63px #424f5e;
+}
+.addColor {
+  color: #195e74;
 }
