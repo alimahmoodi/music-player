@@ -19,54 +19,55 @@ const moreMusic = document.querySelector("#more-music");
 const closeBtn = document.querySelector("#close");
 const ulElem = document.querySelector("ul");
 
-let songIndex = 1;
-
-// function randomIntFromInterval(min, max) {
-//   return Math.floor(Math.random() * (max - min + 1) + min);
-// }
+let activeSongIndex = 1;
+let isPlaying = false;
 
 function loadSong(indexNum) {
+  activeSongIndex = indexNum;
   songName.innerHTML = songsList[indexNum - 1].name;
   songArtist.innerHTML = songsList[indexNum - 1].artist;
   songImage.src = `./images/${songsList[indexNum - 1].img}.jpg`;
   mainAudio.src = `./songs/${songsList[indexNum - 1].src}.mp3`;
+  renderDrawerList();
 }
 
-function playSong() {
+function playSong(index) {
   container.classList.add("paused");
   playPauseBtn.querySelector("i").innerText = "pause";
+  isPlaying = true;
+  loadSong(index);
   mainAudio.play();
 }
 function pauseSong() {
   container.classList.remove("paused");
   playPauseBtn.querySelector("i").innerText = "play_arrow";
+  isPlaying = false;
+  renderDrawerList();
   mainAudio.pause();
 }
 
 function nextSong() {
-  songIndex++;
-  songIndex > songsList.length ? (songIndex = 1) : (songIndex = songIndex);
-  loadSong(songIndex);
-  playSong();
-  playingSong();
+  activeSongIndex++;
+  activeSongIndex > songsList.length
+    ? (activeSongIndex = 1)
+    : (activeSongIndex = activeSongIndex);
+  playSong(activeSongIndex);
 }
 function prevSong() {
-  songIndex--;
-  songIndex < 1 ? (songIndex = songsList.length) : (songIndex = songIndex);
-  loadSong(songIndex);
-  playSong();
-  playingSong();
+  activeSongIndex--;
+  activeSongIndex < 1
+    ? (activeSongIndex = songsList.length)
+    : (activeSongIndex = activeSongIndex);
+  playSong(activeSongIndex);
 }
 
 window.addEventListener("load", () => {
-  loadSong(songIndex);
-  // playingSong();
+  loadSong(activeSongIndex);
 });
 
 playPauseBtn.addEventListener("click", () => {
   const isMusicPaused = container.classList.contains("paused");
-  isMusicPaused ? pauseSong() : playSong();
-  playingSong();
+  isMusicPaused ? pauseSong() : playSong(activeSongIndex);
 });
 
 nextBtn.addEventListener("click", () => {
@@ -111,7 +112,6 @@ fastRewind.addEventListener("click", () => {
 });
 
 speed.addEventListener("click", () => {
- 
   if (mainAudio.playbackRate === 1) {
     mainAudio.playbackRate = 2;
     speed.classList.add("addColor");
@@ -119,7 +119,6 @@ speed.addEventListener("click", () => {
     mainAudio.playbackRate = 1;
     speed.classList.remove("addColor");
   }
-  playingSong();
 });
 
 repeatBtn.addEventListener("click", () => {
@@ -142,14 +141,10 @@ mainAudio.addEventListener("ended", () => {
     nextSong();
   } else if (getInerText === "repeat_one") {
     mainAudio.currentTime = 0;
-    loadSong(songIndex);
-    playSong();
+    playSong(activeSongIndex);
   } else if (getInerText === "shuffle") {
     let shuffleMusic = Math.floor(Math.random() * songsList.length + 1);
-
-    loadSong(shuffleMusic);
-    playSong();
-    playingSong();
+    playSong(shuffleMusic);
   }
 });
 
@@ -163,46 +158,34 @@ closeBtn.addEventListener("click", () => {
   moreMusic.click();
 });
 
-var array = Object.keys(songsList).map(function (key) {
-  let li = `<li li-index="${Number(key) + Number(1)}">
- <div class="list-details">
-   <p>${songsList[key].name}</p>
-   <p>${songsList[key].artist}</p>
- </div>
- <i class="material-icons play">play_arrow</i>
- <audio class="${songsList[key].src}" src="songs/${
-    songsList[key].src
-  }.mp3"></audio>
-</li>`;
-  ulElem.insertAdjacentHTML("beforeend", li);
-});
+function playFromDrawer(index) {
+  if (index === activeSongIndex && isPlaying) {
+    pauseSong(index);
+    return;
+  }
+  playSong(index);
+}
 
-
-function playingSong() {
-  const allLiTag = ulElem.querySelectorAll("li");
-  allLiTag.forEach((item) => {
-    let playPauseIcon = item.querySelector("i");
-    item.setAttribute("onclick", "clicked(this)");
-
-    if (item.getAttribute("li-index") == songIndex) {
-      if (playPauseIcon.innerText == "play_arrow") {
-        playPauseIcon.innerText = "pause";
-      } else if (playPauseIcon.innerText == "pause") {
-        playPauseIcon.innerText = "play_arrow";
-      }
-    } else {
-      playPauseIcon.innerText = "play_arrow";
-    }
+function renderDrawerList() {
+  ulElem.innerHTML = "";
+  const drawerListSong = songsList.map((item, index) => {
+    return `<li onClick="playFromDrawer(${index + 1})" li-index="${index + 1}">
+              <div class="list-details">
+                <p>${item.name}</p>
+                <p>${item.artist}</p>
+              </div>
+               ${
+                 activeSongIndex === index + 1 && isPlaying
+                   ? '<i class="material-icons play">pause</i>'
+                   : '<i class="material-icons play">play_arrow</i>'
+               } 
+            </li>`;
   });
+  ulElem.insertAdjacentHTML("beforeend", drawerListSong.join(""));
 }
 
 function clicked(element) {
   let getLiIndex = element.getAttribute("li-index");
-
-  songIndex = getLiIndex; 
-  loadSong(songIndex);
-  playSong();
-  playingSong();
+  activeSongIndex = getLiIndex;
+  playSong(activeSongIndex);
 }
-
-
