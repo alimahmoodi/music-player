@@ -15,12 +15,15 @@ const repeatBtn = document.querySelector("#repeat-plist");
 const fastForward = document.querySelector("#fast-forward");
 const fastRewind = document.querySelector("#fast-rewind");
 const speed = document.querySelector(".speed");
+const moreMusic = document.querySelector("#more-music");
+const closeBtn = document.querySelector("#close");
+const ulElem = document.querySelector("ul");
 
 let songIndex = 1;
 
-function randomIntFromInterval(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
+// function randomIntFromInterval(min, max) {
+//   return Math.floor(Math.random() * (max - min + 1) + min);
+// }
 
 function loadSong(indexNum) {
   songName.innerHTML = songsList[indexNum - 1].name;
@@ -45,21 +48,25 @@ function nextSong() {
   songIndex > songsList.length ? (songIndex = 1) : (songIndex = songIndex);
   loadSong(songIndex);
   playSong();
+  playingSong();
 }
 function prevSong() {
   songIndex--;
   songIndex < 1 ? (songIndex = songsList.length) : (songIndex = songIndex);
   loadSong(songIndex);
   playSong();
+  playingSong();
 }
 
 window.addEventListener("load", () => {
   loadSong(songIndex);
+  // playingSong();
 });
 
 playPauseBtn.addEventListener("click", () => {
   const isMusicPaused = container.classList.contains("paused");
   isMusicPaused ? pauseSong() : playSong();
+  playingSong();
 });
 
 nextBtn.addEventListener("click", () => {
@@ -94,17 +101,17 @@ mainAudio.addEventListener("timeupdate", (e) => {
 });
 
 fastForward.addEventListener("click", () => {
-  mainAudio.currentTime += 6;
+  mainAudio.currentTime += 30;
   fastForward.setAttribute("title", "fast-forward");
 });
 
 fastRewind.addEventListener("click", () => {
-  mainAudio.currentTime -= 6;
+  mainAudio.currentTime -= 30;
   fastRewind.setAttribute("title", "fast-rewind");
 });
 
 speed.addEventListener("click", () => {
-  // speed.classList.toggle("add");
+ 
   if (mainAudio.playbackRate === 1) {
     mainAudio.playbackRate = 2;
     speed.classList.add("addColor");
@@ -112,6 +119,7 @@ speed.addEventListener("click", () => {
     mainAudio.playbackRate = 1;
     speed.classList.remove("addColor");
   }
+  playingSong();
 });
 
 repeatBtn.addEventListener("click", () => {
@@ -137,8 +145,64 @@ mainAudio.addEventListener("ended", () => {
     loadSong(songIndex);
     playSong();
   } else if (getInerText === "shuffle") {
-    const shuffleMusic = randomIntFromInterval(1, songsList.length - 1);
+    let shuffleMusic = Math.floor(Math.random() * songsList.length + 1);
+
     loadSong(shuffleMusic);
     playSong();
+    playingSong();
   }
 });
+
+const musicList = document.querySelector(".music-list");
+
+moreMusic.addEventListener("click", () => {
+  musicList.classList.toggle("show");
+});
+
+closeBtn.addEventListener("click", () => {
+  moreMusic.click();
+});
+
+var array = Object.keys(songsList).map(function (key) {
+  let li = `<li li-index="${Number(key) + Number(1)}">
+ <div class="list-details">
+   <p>${songsList[key].name}</p>
+   <p>${songsList[key].artist}</p>
+ </div>
+ <i class="material-icons play">play_arrow</i>
+ <audio class="${songsList[key].src}" src="songs/${
+    songsList[key].src
+  }.mp3"></audio>
+</li>`;
+  ulElem.insertAdjacentHTML("beforeend", li);
+});
+
+
+function playingSong() {
+  const allLiTag = ulElem.querySelectorAll("li");
+  allLiTag.forEach((item) => {
+    let playPauseIcon = item.querySelector("i");
+    item.setAttribute("onclick", "clicked(this)");
+
+    if (item.getAttribute("li-index") == songIndex) {
+      if (playPauseIcon.innerText == "play_arrow") {
+        playPauseIcon.innerText = "pause";
+      } else if (playPauseIcon.innerText == "pause") {
+        playPauseIcon.innerText = "play_arrow";
+      }
+    } else {
+      playPauseIcon.innerText = "play_arrow";
+    }
+  });
+}
+
+function clicked(element) {
+  let getLiIndex = element.getAttribute("li-index");
+
+  songIndex = getLiIndex; 
+  loadSong(songIndex);
+  playSong();
+  playingSong();
+}
+
+
